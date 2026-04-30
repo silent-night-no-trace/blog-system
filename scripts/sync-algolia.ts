@@ -1,0 +1,53 @@
+import algoliasearch from 'algoliasearch'
+import { getSortedPosts } from '@/lib/posts'
+
+const appId = process.env.ALGOLIA_APP_ID || ''
+const adminKey = process.env.ALGOLIA_ADMIN_KEY || ''
+const indexName = process.env.ALGOLIA_INDEX_NAME || 'blog_posts'
+
+const client = algoliasearch(appId, adminKey)
+const index = client.initIndex(indexName)
+
+async function syncToAlgolia() {
+  try {
+    const posts = getSortedPosts()
+    
+    const records = posts.map((post) => ({
+      objectID: post.slug,
+      title: post.title,
+      slug: post.slug,
+      date: post.date.toISOString(),
+      tags: post.tags,
+      excerpt: post.excerpt,
+      content: post.body.raw,
+      readingTime: post.readingTime,
+    }))
+    
+    // 清空旧数据并添加新数据
+    await index.clearObjects()
+    await index.saveObjects(records)
+    
+    // 设置索引配置
+    await index.setSettings({
+      searchableAttributes: ['title', 'content', 'tags', 'excerpt'],
+      attributesForFaceting: ['tags'],
+      ranking: [
+        'typo',
+        'geo',
+        'words',
+        'filters',
+        'proximity',
+        'attribute',
+        'exact',
+        'custom'
+      ],
+    })
+    
+    console.log(`✅ Successfully synced ${records.length} posts to Algolia`)
+  } catch (error) {
+    console.error('❌ Error syncing to Algolia:', error)
+    process.exit(1)
+  }
+}
+
+syncToAlgolia()
