@@ -1,45 +1,70 @@
-# Welcome to the Blog System
+# 博客系统 (Blog System)
 
-> 一个使用 Next.js 15 构建的精美博客系统，采用苹果设计风格
+> 一个使用 Next.js 16 构建的精美博客系统，采用苹果设计风格，支持 Markdown 内容、Algolia 搜索和 Giscus 评论。
+
+![Next.js](https://img.shields.io/badge/Next.js-16.2.4-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwind-css)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 🚀 技术栈
 
-- **Next.js 15** (App Router) - 全栈框架
-- **TypeScript** - 静态类型
-- **Tailwind CSS** - 原子化 CSS
-- **Contentlayer** - 内容层（类型安全）
-- **MDX** - 支持交互式组件
-- **Algolia** - 搜索引擎
-- **Giscus** - 评论系统（基于 GitHub Discussions）
-- **Vercel** - 部署平台
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 框架 | Next.js (App Router) | 16.2.4 |
+| 语言 | TypeScript | 5.x |
+| 样式 | Tailwind CSS | 3.4+ |
+| 内容 | Contentlayer | 0.3.4 |
+| 搜索 | Algolia | 5.52.0 |
+| 评论 | Giscus | 3.1.0 |
+| MDX | @mdx-js/react | 2.3.0 |
+| 字体 | Geist | - |
+| 构建 | webpack | - |
 
-## 📋 安装步骤
+## 📋 快速开始
 
-### 1. 安装依赖
+### 1. 克隆项目
+
+```bash
+git clone <your-repo-url>
+cd blog-system
+```
+
+### 2. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 2. 配置环境变量
+### 3. 配置环境变量
 
-复制 `.env.local.example` 到 `.env.local` 并填写你的 API 密钥：
+复制示例配置文件：
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-需要配置：
-- Algolia 搜索（App ID, Search Key, Admin Key）
-- Giscus 评论（Repo, Repo ID, Category ID）
+编辑 `.env.local` 填写你的 API 密钥：
 
-### 3. 创建内容目录
+```env
+# Algolia 搜索
+NEXT_PUBLIC_ALGOLIA_APP_ID=your_app_id
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=your_search_key
+ALGOLIA_ADMIN_KEY=your_admin_key
+NEXT_PUBLIC_ALGOLIA_INDEX_NAME=blog_posts
 
-```bash
-mkdir -p content/posts
+# Giscus 评论
+NEXT_PUBLIC_GISCUS_REPO=your-username/your-repo
+NEXT_PUBLIC_GISCUS_REPO_ID=your_repo_id
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=your_category_id
 ```
 
-### 4. 开发服务器
+**获取 API 密钥**：
+
+- **Algolia**: [注册账号](https://www.algolia.com/) → 创建应用 → 获取 App ID 和 API Keys
+- **Giscus**: [配置指南](https://giscus.app/zh-CN) → 选择仓库 → 获取 Repo ID 和 Category ID
+
+### 4. 运行开发服务器
 
 ```bash
 npm run dev
@@ -50,75 +75,501 @@ npm run dev
 ## 📁 项目结构
 
 ```
-/blog-system
-├── app/                    # Next.js App Router
-│   ├── posts/[slug]/
-│   ├── tags/[tag]/
-│   ├── search/
-│   ├── archive/
-│   └── ...
-├── components/             # React 组件
-├── content/posts/          # Markdown 博文
-├── lib/                    # 工具函数
-├── public/                 # 静态资源
-├── contentlayer.config.ts  # Contentlayer 配置
-├── tailwind.config.ts      # Tailwind CSS 配置
+blog-system/
+├── app/                          # Next.js App Router
+│   ├── posts/                    # 文章相关
+│   │   ├── page.tsx             # 文章列表
+│   │   └── [slug]/page.tsx      # 文章详情
+│   ├── tags/                     # 标签相关
+│   │   ├── page.tsx             # 标签云
+│   │   └── [tag]/page.tsx       # 标签详情
+│   ├── archive/                  # 归档页面
+│   ├── search/                   # 搜索页面
+│   ├── layout.tsx               # 根布局
+│   └── page.tsx                 # 首页
+├── components/                   # React 组件
+│   ├── ui/                       # UI 组件
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── badge.tsx
+│   │   └── container.tsx
+│   ├── layout/                   # 布局组件
+│   │   ├── header.tsx
+│   │   └── footer.tsx
+│   └── comments/                 # 评论组件
+│       └── giscus.tsx
+├── content/posts/                # Markdown 文章
+├── lib/                          # 工具函数
+├── public/                       # 静态资源
+├── .env.local                    # 环境变量（不提交）
+├── .env.local.example            # 环境变量示例
+├── contentlayer.config.ts        # Contentlayer 配置
+├── next.config.ts                # Next.js 配置
+├── tailwind.config.ts            # Tailwind CSS 配置
 └── package.json
 ```
 
 ## 🎯 核心功能
 
-### ✅ 必做功能
-1. 博文展示（列表页、详情页）
-2. Algolia 搜索（自动补全、高亮）
-3. 标签分类（标签云、标签页）
-4. 归档页面（按年月分类）
-5. Giscus 评论系统
-6. 响应式设计
+### ✅ 已实现功能
 
-### 🚫 延期功能
-- 用户系统
-- 文章收藏
-- 暗黑模式
-- 社交分享
+1. **文章系统**
+   - 📝 Markdown/MDX 支持
+   - 📅 按日期排序
+   - ⏱️ 阅读时间计算
+   - 🔗 上下篇导航
+
+2. **搜索系统**
+   - 🔍 Algolia 全文搜索
+   - 💡 实时搜索建议
+   - 🎯 高亮搜索结果
+   - 🏷️ 标签筛选
+
+3. **标签系统**
+   - 🏷️ 标签云展示
+   - 📊 标签文章统计
+   - 🔗 标签详情页
+
+4. **归档系统**
+   - 📅 按年月分组
+   - 📊 文章时间线
+   - 🏷️ 标签展示
+
+5. **评论系统**
+   - 💬 Giscus 评论（基于 GitHub Discussions）
+   - 🌓 暗黑模式自适应
+   - 🔄 实时互动
+
+6. **UI/UX**
+   - 🎨 苹果设计风格
+   - 🌙 暗黑模式支持
+   - 📱 响应式设计
+   - 🎭 平滑动画
+   - 🔍 毛玻璃效果
 
 ## 🔧 开发命令
 
 ```bash
-npm run dev         # 启动开发服务器
-npm run build       # 构建生产版本
-npm run start       # 启动生产服务器
-npm run lint        # 运行 ESLint
+# 启动开发服务器
+npm run dev
+
+# 构建生产版本
+npm run build
+
+# 启动生产服务器
+npm run start
+
+# 运行 ESLint
+npm run lint
+
+# 同步文章到 Algolia
+npm run sync:algolia
 ```
 
-## 📝 创建博文
+## 📝 创建文章
 
-在 `content/posts/` 目录下创建 Markdown 文件：
+在 `content/posts/` 目录下创建 `.md` 文件：
 
 ```markdown
 ---
 title: "文章标题"
 slug: article-slug
-date: 2026-04-30
+date: 2026-05-16
 tags: ["标签1", "标签2"]
-excerpt: "文章摘要"
+excerpt: "文章摘要，用于列表展示"
 coverImage: "/images/cover.jpg"
 ---
 
 # 文章内容
 
 使用 Markdown 或 MDX 编写...
+
+## 支持的语法
+
+- ✅ 标题
+- ✅ 代码块
+- ✅ 列表
+- ✅ 链接
+- ✅ 表格
+- ✅ 图片
+
+## 代码示例
+
+```typescript
+function hello() {
+  console.log('Hello World')
+}
+```
 ```
 
-## 🌐 部署
+---
 
-使用 Vercel 一键部署：
+## 🚀 部署指南
+
+### 🌐 Vercel 部署（推荐）
+
+**1. 连接 GitHub 仓库**
+
+- 访问 [Vercel](https://vercel.com/)
+- 点击 "New Project"
+- 选择你的 GitHub 仓库
+
+**2. 配置环境变量**
+
+在 Vercel Dashboard 中添加环境变量：
+
+```
+NEXT_PUBLIC_ALGOLIA_APP_ID=...
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=...
+ALGOLIA_ADMIN_KEY=...
+NEXT_PUBLIC_ALGOLIA_INDEX_NAME=blog_posts
+NEXT_PUBLIC_GISCUS_REPO=...
+NEXT_PUBLIC_GISCUS_REPO_ID=...
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=...
+```
+
+**3. 同步内容到 Algolia**
+
+```bash
+npm run sync:algolia
+```
+
+**4. 部署**
 
 ```bash
 npm install -g vercel
-vercel
+vercel --prod
 ```
+
+访问生成的 URL 即可。
+
+---
+
+### 🐳 Docker 部署
+
+**1. 创建 Dockerfile**
+
+```dockerfile
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.env.production ./.env.local
+
+RUN npm ci --production
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
+
+**2. 构建镜像**
+
+```bash
+docker build -t blog-system .
+```
+
+**3. 运行容器**
+
+```bash
+docker run -p 3000:3000 \
+  -e NEXT_PUBLIC_ALGOLIA_APP_ID=... \
+  -e NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=... \
+  -e ALGOLIA_ADMIN_KEY=... \
+  -e NEXT_PUBLIC_ALGOLIA_INDEX_NAME=blog_posts \
+  -e NEXT_PUBLIC_GISCUS_REPO=... \
+  -e NEXT_PUBLIC_GISCUS_REPO_ID=... \
+  -e NEXT_PUBLIC_GISCUS_CATEGORY_ID=... \
+  blog-system
+```
+
+**4. 同步 Algolia 内容**
+
+```bash
+docker exec <container-id> npm run sync:algolia
+```
+
+---
+
+### 🖥️ 传统服务器部署
+
+**1. 安装 Node.js**
+
+```bash
+# Ubuntu/Debian
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# CentOS/RHEL
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo yum install -y nodejs
+```
+
+**2. 上传项目**
+
+```bash
+# 使用 scp 或其他方式上传
+scp -r ./blog-system user@your-server:/var/www/
+```
+
+**3. 安装依赖**
+
+```bash
+cd /var/www/blog-system
+npm install
+```
+
+**4. 配置环境变量**
+
+```bash
+cp .env.local.example .env.local
+nano .env.local
+# 填写生产环境的 API 密钥
+```
+
+**5. 构建项目**
+
+```bash
+npm run build
+```
+
+**6. 同步到 Algolia**
+
+```bash
+npm run sync:algolia
+```
+
+**7. 使用 PM2 启动（推荐）**
+
+```bash
+# 安装 PM2
+npm install -g pm2
+
+# 启动应用
+pm2 start npm --name "blog-system" -- start
+
+# 设置开机自启
+pm2 startup
+pm2 save
+
+# 查看状态
+pm2 status
+
+# 查看日志
+pm2 logs blog-system
+```
+
+**8. 配置 Nginx**
+
+创建 `/etc/nginx/sites-available/blog-system`：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+启用配置：
+
+```bash
+sudo ln -s /etc/nginx/sites-available/blog-system /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+**9. 配置 HTTPS（可选）**
+
+使用 Certbot：
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d your-domain.com
+```
+
+---
+
+### 🛠️ 常见部署问题
+
+#### 1. Algolia 搜索不工作
+
+**原因**: 环境变量未正确配置  
+**解决**:
+```bash
+# 检查环境变量
+echo $NEXT_PUBLIC_ALGOLIA_APP_ID
+
+# 重新同步
+npm run sync:algolia
+```
+
+#### 2. Giscus 评论不显示
+
+**原因**: GitHub 仓库未启用 Discussions  
+**解决**:
+1. 访问 GitHub 仓库 Settings
+2. 启用 Discussions 功能
+3. 创建对应的 Category
+
+#### 3. 构建失败
+
+**原因**: Contentlayer 生成失败  
+**解决**:
+```bash
+# 清理缓存
+rm -rf .next .contentlayer node_modules
+npm install
+npm run build
+```
+
+#### 4. 端口被占用
+
+**解决**:
+```bash
+# 修改端口（Next.js 默认 3000）
+PORT=3001 npm start
+
+# 或修改 package.json
+"start": "next start -p 3001"
+```
+
+---
+
+### 📊 性能优化建议
+
+1. **启用 CDN**
+   - 使用 Vercel/Cloudflare CDN
+   - 配置静态资源缓存
+
+2. **图片优化**
+   - 使用 Next.js Image 组件
+   - 压缩图片大小
+
+3. **代码分割**
+   - 已默认启用（Next.js App Router）
+
+4. **启用 Gzip/Brotli 压缩**
+   ```nginx
+   # Nginx 配置
+   gzip on;
+   gzip_types text/plain text/css application/json application/javascript;
+   ```
+
+---
+
+### 🔄 CI/CD 配置（GitHub Actions）
+
+创建 `.github/workflows/deploy.yml`：
+
+```yaml
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+```
+
+---
+
+## 🎨 UI 组件文档
+
+### Button
+
+```tsx
+<Button variant="primary" size="md">
+  Click me
+</Button>
+```
+
+**Variants**: `primary` | `secondary` | `outline` | `ghost`  
+**Sizes**: `sm` | `md` | `lg`
+
+### Card
+
+```tsx
+<Card variant="elevated">
+  <CardContent>
+    Content here
+  </CardContent>
+</Card>
+```
+
+**Variants**: `default` | `bordered` | `elevated`
+
+### Badge
+
+```tsx
+<Badge variant="primary">
+  New
+</Badge>
+```
+
+**Variants**: `default` | `primary` | `success` | `warning` | `destructive`
+
+---
 
 ## 📄 许可证
 
-MIT
+MIT License
+
+Copyright (c) 2026 Blog System
+
+Permission is hereby granted...
+
+---
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+## 📧 联系方式
+
+- 邮箱: your-email@example.com
+- GitHub: [@your-username](https://github.com/your-username)

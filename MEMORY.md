@@ -1,0 +1,1 @@
+- [博客系统进度](memory/blog-system-progress.md) — Task 1 已完成，初始化 Next.js 15 项目
