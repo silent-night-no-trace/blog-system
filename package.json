@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync:algolia": "tsx scripts/sync-algolia.ts",
+    "generate:content": "content-collections build",
+    "sync:algolia": "npm run generate:content && tsx scripts/sync-algolia.ts",
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
@@ -14,7 +15,6 @@
     "@giscus/react": "^3.1.0",
     "algoliasearch": "^5.52.0",
     "class-variance-authority": "^0.7.1",
-    "contentlayer": "^0.3.4",
     "highlight.js": "^11.11.1",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
@@ -23,11 +23,15 @@
     "react-dom": "19.2.4",
     "react-instantsearch": "^7.32.2",
     "rehype": "^13.0.2",
-    "rehype-highlight": "^6.0.0",
+    "rehype-highlight": "^7.0.2",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@content-collections/cli": "^0.1.9",
+    "@content-collections/core": "^0.15.1",
+    "@content-collections/markdown": "^0.1.4",
+    "@content-collections/next": "^0.2.11",
     "@mdx-js/react": "^2.3.0",
     "@next/mdx": "^16.2.6",
     "@tailwindcss/typography": "^0.5.19",
@@ -41,6 +45,6 @@
     "tailwindcss": "^3.4.19",
     "tsx": "^4.21.0",
     "typescript": "^5",
-    "vfile": "^5.3.7"
+    "zod": "^3.25.76"
   }
 }
