@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Blog System Development
 
-Next.js 15 博客系统 - 苹果设计风格
+Next.js 16 博客系统 - 苹果设计风格
 
 ## 📁 项目结构
 
@@ -41,15 +41,15 @@ blog-system/
 ├── content/posts/                # Markdown 文章
 ├── lib/                          # 工具函数
 ├── public/                       # 静态资源
-└── contentlayer.config.ts        # Contentlayer 配置
+└── content-collections.ts        # Content Collections 配置
 ```
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 15 (App Router)
+- **框架**: Next.js 16 (App Router)
 - **语言**: TypeScript
-- **样式**: Tailwind CSS 4
-- **内容**: Contentlayer
+- **样式**: Tailwind CSS 3.4.x
+- **内容**: Content Collections
 - **搜索**: Algolia (react-instantsearch)
 - **评论**: Giscus
 - **字体**: Geist (苹果风格)
@@ -62,6 +62,7 @@ npm run dev          # 启动开发服务器
 npm run build        # 构建生产版本
 npm run start        # 启动生产服务器
 npm run lint         # 运行 ESLint
+npm run generate:content # 生成内容集合
 ```
 
 ## 🔧 环境变量
@@ -86,10 +87,8 @@ npm run lint         # 运行 ESLint
 ✅ 标签系统（标签云、标签筛选）
 ✅ 归档页面（按年月分组的时间线）
 ✅ 响应式设计（移动端适配）
-
-### 待集成
-⚠️ Algolia 搜索（需要配置 API 密钥）
-⚠️ Giscus 评论（需要配置 GitHub 仓库）
+✅ Algolia 搜索（需要环境变量与索引同步）
+✅ Giscus 评论（需要 GitHub Discussions 配置）
 
 ## 📝 文章示例
 

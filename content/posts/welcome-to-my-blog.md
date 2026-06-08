@@ -3,13 +3,13 @@ title: "欢迎来到我的博客"
 slug: welcome-to-my-blog
 date: 2026-04-30
 tags: ["博客", "介绍", "Next.js"]
-excerpt: "这是一个使用 Next.js 15 构建的精美博客系统，支持 Markdown、搜索、标签等功能。"
+excerpt: "这是一个使用 Next.js 16 构建的精美博客系统，支持 Markdown、搜索、标签等功能。"
 coverImage: "/images/welcome.jpg"
 ---
 
 # 欢迎来到我的博客
 
-这是一个使用 **Next.js 15** 构建的精美博客系统。
+这是一个使用 **Next.js 16** 构建的精美博客系统。
 
 ## 主要特性
 
@@ -21,7 +21,8 @@ coverImage: "/images/welcome.jpg"
 
 ## 开发技术栈
 
-- **框架**: Next.js 15 (App Router)
+- **框架**: Next.js 16 (App Router)
+- **内容**: Content Collections
 - **语言**: TypeScript
 - **样式**: Tailwind CSS
 - **搜索**: Algolia
