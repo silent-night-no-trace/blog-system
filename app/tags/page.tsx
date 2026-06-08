@@ -1,24 +1,9 @@
-import { allPosts } from 'contentlayer/generated'
-import { Card, CardContent } from '@/components/ui/card'
+import { getTagsWithCounts } from '@/lib/posts'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
-// 获取所有标签及其文章数量
-function getAllTags() {
-  const tagsMap = new Map<string, number>()
-
-  allPosts.forEach(post => {
-    post.tags.forEach(tag => {
-      tagsMap.set(tag, (tagsMap.get(tag) || 0) + 1)
-    })
-  })
-
-  return Array.from(tagsMap.entries())
-    .sort((a, b) => b[1] - a[1]) // 按文章数量排序
-}
-
 export default function TagsPage() {
-  const tags = getAllTags()
+  const tags = getTagsWithCounts()
 
   return (
     <div className="py-12">
@@ -34,7 +19,7 @@ export default function TagsPage() {
 
         <div className="flex flex-wrap gap-3">
           {tags.map(([tag, count]) => (
-            <Link key={tag} href={`/tags/${tag}`}>
+            <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`}>
               <Badge variant="primary" className="px-4 py-2 text-sm hover:opacity-80 transition-opacity">
                 {tag} <span className="ml-1 opacity-75">({count})</span>
               </Badge>

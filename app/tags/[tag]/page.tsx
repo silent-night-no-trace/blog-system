@@ -1,14 +1,21 @@
-import { allPosts } from 'contentlayer/generated'
+import { getAllTags, getPostsByTag } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
-export default function TagPage({ params }: { params: { tag: string } }) {
-  const decodedTag = decodeURIComponent(params.tag)
-  const posts = allPosts
-    .filter(post => post.tags.includes(decodedTag))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+export function generateStaticParams() {
+  return getAllTags().map((tag) => ({ tag }))
+}
+
+export default async function TagPage({
+  params,
+}: {
+  params: Promise<{ tag: string }>
+}) {
+  const { tag } = await params
+  const decodedTag = decodeURIComponent(tag)
+  const posts = getPostsByTag(decodedTag)
 
   if (posts.length === 0) {
     notFound()
@@ -28,7 +35,7 @@ export default function TagPage({ params }: { params: { tag: string } }) {
             <Badge variant="primary">{posts.length} posts</Badge>
           </div>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Articles tagged with "{decodedTag}"
+            Articles tagged with &ldquo;{decodedTag}&rdquo;
           </p>
         </div>
 
