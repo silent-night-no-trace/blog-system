@@ -1,13 +1,11 @@
-import { allPosts } from 'contentlayer/generated'
+import { getSortedPosts } from '@/lib/posts'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
 export default function HomePage() {
   // 获取最新的 3 篇文章
-  const latestPosts = allPosts
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3)
+  const latestPosts = getSortedPosts().slice(0, 3)
 
   return (
     <div className="flex-1">

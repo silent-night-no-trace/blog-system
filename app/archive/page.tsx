@@ -1,52 +1,7 @@
-import { allPosts } from 'contentlayer/generated'
+import { getAllPosts, getArchive } from '@/lib/posts'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-
-interface ArchiveGroup {
-  year: number
-  months: {
-    month: number
-    posts: typeof allPosts
-  }[]
-}
-
-// 按年月分组文章
-function getArchive(): ArchiveGroup[] {
-  const postsByYear = new Map<number, Map<number, typeof allPosts>>()
-
-  allPosts.forEach(post => {
-    const date = new Date(post.date)
-    const year = date.getFullYear()
-    const month = date.getMonth() + 1 // 1-12
-
-    if (!postsByYear.has(year)) {
-      postsByYear.set(year, new Map())
-    }
-
-    const monthsMap = postsByYear.get(year)!
-    if (!monthsMap.has(month)) {
-      monthsMap.set(month, [])
-    }
-
-    monthsMap.get(month)!.push(post)
-  })
-
-  // 转换为数组并排序
-  return Array.from(postsByYear.entries())
-    .sort(([yearA], [yearB]) => yearB - yearA) // 年份降序
-    .map(([year, monthsMap]) => ({
-      year,
-      months: Array.from(monthsMap.entries())
-        .sort(([monthA], [monthB]) => monthB - monthA) // 月份降序
-        .map(([month, posts]) => ({
-          month,
-          posts: posts.sort((a, b) =>
-            new Date(b.date).getTime() - new Date(a.date).getTime()
-          )
-        }))
-    }))
-}
 
 export default function ArchivePage() {
   const archive = getArchive()
@@ -59,7 +14,7 @@ export default function ArchivePage() {
             Archive
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            {allPosts.length} articles in total
+            {getAllPosts().length} articles in total
           </p>
         </div>
 

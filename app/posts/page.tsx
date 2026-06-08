@@ -1,12 +1,10 @@
-import { allPosts } from 'contentlayer/generated'
+import { getSortedPosts } from '@/lib/posts'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 
 export default function PostsPage() {
-  const posts = allPosts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+  const posts = getSortedPosts()
 
   return (
     <div className="py-12">
