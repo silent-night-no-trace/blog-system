@@ -1,17 +1,28 @@
 'use client'
 
-import { useState } from 'react'
 import { InstantSearch, SearchBox, Hits, Highlight, useInstantSearch } from 'react-instantsearch'
 import { liteClient } from 'algoliasearch/lite'
+import type { Hit as AlgoliaHit } from 'instantsearch.js'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 
-const searchClient = liteClient(
-  process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-  process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY!
-)
+type BlogSearchHit = {
+  title: string
+  slug: string
+  date: string
+  tags?: string[]
+  excerpt: string
+  readingTime: number
+}
 
-function Hit({ hit }: { hit: any }) {
+const algoliaAppId = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID
+const algoliaSearchKey = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
+const algoliaIndexName = process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME
+const searchClient = algoliaAppId && algoliaSearchKey
+  ? liteClient(algoliaAppId, algoliaSearchKey)
+  : null
+
+function Hit({ hit }: { hit: AlgoliaHit<BlogSearchHit> }) {
   return (
     <Link href={`/posts/${hit.slug}`} className="block">
       <div className="mb-6 last:mb-0">
@@ -47,10 +58,11 @@ function Hit({ hit }: { hit: any }) {
   )
 }
 
-function NoResults() {
-  const { indexUiState } = useInstantSearch()
+function SearchResults() {
+  const { error, indexUiState, results, status } = useInstantSearch({ catchError: true })
+  const hasQuery = Boolean(indexUiState.query?.trim())
 
-  if (!indexUiState.query) {
+  if (!hasQuery) {
     return (
       <div className="py-12 text-center text-zinc-500 dark:text-zinc-500">
         <p>Type to search articles...</p>
@@ -58,33 +70,74 @@ function NoResults() {
     )
   }
 
-  return (
-    <div className="py-12 text-center">
-      <h3 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-        No results found
-      </h3>
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Try different keywords or check the spelling.
-      </p>
-    </div>
-  )
-}
+  if (status === 'error') {
+    return (
+      <div className="py-12 text-center">
+        <h3 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+          Search is temporarily unavailable
+        </h3>
+        <p className="text-zinc-600 dark:text-zinc-400">
+          {error?.message || 'Please try again later.'}
+        </p>
+      </div>
+    )
+  }
 
-function LoadingIndicator() {
   return (
-    <div className="py-12 text-center">
-      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-zinc-900 dark:border-zinc-800 dark:border-t-zinc-100" />
-    </div>
+    <>
+      <div className="space-y-6">
+        <Hits<BlogSearchHit>
+          hitComponent={Hit}
+          classNames={{
+            root: '',
+            list: '',
+            item: '',
+          }}
+        />
+      </div>
+
+      {status === 'loading' || status === 'stalled' ? (
+        <div className="py-12 text-center text-zinc-500 dark:text-zinc-500">
+          <p>Searching...</p>
+        </div>
+      ) : null}
+
+      {results.nbHits === 0 ? (
+        <div className="py-12 text-center">
+          <h3 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            No results found
+          </h3>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Try different keywords or check the spelling.
+          </p>
+        </div>
+      ) : null}
+    </>
   )
 }
 
 export default function SearchPage() {
+  if (!searchClient || !algoliaIndexName) {
+    return (
+      <div className="py-12">
+        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
+          <h1 className="mb-3 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+            Search is not configured
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Configure Algolia environment variables to enable article search.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="py-12">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <InstantSearch
           searchClient={searchClient}
-          indexName={process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME!}
+          indexName={algoliaIndexName}
         >
           <SearchBox
             placeholder="Search articles..."
@@ -98,18 +151,7 @@ export default function SearchPage() {
             }}
           />
 
-          <div className="space-y-6">
-            <Hits
-              hitComponent={Hit}
-              classNames={{
-                root: '',
-                list: '',
-                item: '',
-              }}
-            />
-          </div>
-
-          <NoResults />
+          <SearchResults />
         </InstantSearch>
       </div>
     </div>
