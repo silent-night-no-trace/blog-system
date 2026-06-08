@@ -3,8 +3,8 @@
 import Giscus from '@giscus/react'
 import { useTheme } from 'next-themes'
 
-export function GiscusComments({ slug }: { slug: string }) {
-  const { theme, resolvedTheme } = useTheme()
+export function GiscusComments() {
+  const { resolvedTheme } = useTheme()
 
   return (
     <div className="pt-8">
