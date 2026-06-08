@@ -1,5 +1,7 @@
 # 博客系统实施计划
 
+> Historical note: This plan reflects an earlier Contentlayer-based implementation. The active project has migrated to Content Collections. Do not follow the `next-contentlayer`, `withContentlayer`, `next-contentlayer/hooks`, Algolia v4 `initIndex`, or `post.body.code` examples in this document for current work.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 从 0-1 构建一个精美的 Next.js 15 博客系统，支持 Markdown 博文、Algolia 搜索、Giscus 评论、标签分类。
