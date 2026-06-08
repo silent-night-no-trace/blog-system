@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Contentlayer
+# Contentlayer legacy artifacts
 .contentlayer
+
+# Content Collections
+.content-collections
