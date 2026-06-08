@@ -1,1 +1,1 @@
-- [博客系统进度](memory/blog-system-progress.md) — Task 1 已完成，初始化 Next.js 15 项目
+- [博客系统进度](memory/blog-system-progress.md) — 历史初始化记录；当前实现为 Next.js 16.2.x + Content Collections

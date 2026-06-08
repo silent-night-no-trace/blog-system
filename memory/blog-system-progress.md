@@ -4,9 +4,11 @@ description: 博客系统项目当前进度
 type: project
 ---
 
-**当前状态**：Task 1 项目初始化完成
+**当前状态**：历史记录；当前实现已迁移到 Next.js 16.2.x + Content Collections。
 
 ## 已完成的工作
+
+> 历史记录：早期计划使用 Contentlayer/next-contentlayer；当前实现已迁移到 Content Collections。以下 Task 1 内容保留为项目历史，不代表当前依赖状态。
 
 ### Task 1: 项目初始化 ✅
 
@@ -110,24 +112,20 @@ type: project
 
 ## 技术栈确认
 
-- ✅ Next.js 15 (App Router) - 版本 16.2.4
+- ✅ Next.js 16.2.x (App Router)
 - ✅ TypeScript - 版本 5
-- ✅ Tailwind CSS - 版本 4
-- ✅ Contentlayer - 版本 0.3.4
+- ✅ Tailwind CSS - 版本 3.4.x
+- ✅ Content Collections - 版本 0.15.x
 - ✅ React - 版本 19.2.4
-- ✅ MDX 支持 - remark, rehype
-- ⏸️ Algolia - 已安装，未测试
-- ⏸️ Giscus - 已安装，未集成
+- ✅ Markdown HTML 生成 - remark-gfm, rehype-highlight
+- ✅ Algolia - 已安装并通过 dry-run 验证
+- ✅ Giscus - 已集成，需要 GitHub Discussions 配置
 
 ## 已知问题
 
-1. **依赖冲突**：next-contentlayer@0.3.4 期望 Next.js 12/13，但使用了 Next.js 16
-   - 解决方案：使用 `--legacy-peer-deps` 标志
-   - 风险：可能存在兼容性问题，需要测试验证
+1. **历史依赖冲突已移除**：`next-contentlayer@0.3.4` 只支持 Next 12/13，当前实现不再使用 `next-contentlayer`。
 
-2. **Turbopack 错误**：Contentlayer 使用 Webpack，Next.js 16 默认使用 Turbopack
-   - 解决方案：开发服务器使用 `--webpack` 标志
-   - 影响：无法使用 Turbopack，但 Webpack 工作正常
+2. **历史 clean build 风险已移除**：Contentlayer 生成目录缺失会导致 `contentlayer/generated` 找不到；当前 Content Collections 通过 Next adapter 在 build 时生成内容。
 
 ## 下一步
 

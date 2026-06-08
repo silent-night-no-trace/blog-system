@@ -24,7 +24,7 @@
 
 ### 4. 内容管理
 - ✅ 3篇示例文章
-- ✅ Contentlayer 集成
+- ✅ Content Collections 集成
 - ✅ Markdown/MDX 支持
 
 ### 5. 第三方服务
@@ -32,16 +32,16 @@
 - ✅ Giscus 评论 (已配置)
 
 ### 6. 样式系统
-- ✅ Tailwind CSS 4
+- ✅ Tailwind CSS 3.4.x
 - ✅ 苹果设计风格
 - ✅ 暗黑模式支持
 
 ## 📊 技术栈
 
-- Next.js 15 (App Router)
+- Next.js 16.2.x (App Router)
 - TypeScript
-- Tailwind CSS 4
-- Contentlayer
+- Tailwind CSS 3.4.x
+- Content Collections
 - Algolia (搜索)
 - Giscus (评论)
 - React 19

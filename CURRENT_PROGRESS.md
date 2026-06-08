@@ -18,7 +18,7 @@
 ### 2. 服务器状态
 ```
 ✓ Server: http://localhost:3001
-✓ Contentlayer: 3 documents generated
+✓ Content Collections: 3 documents generated
 ✓ Environment: .env.local loaded
 ✓ No errors found
 ✓ Ready in 185ms
