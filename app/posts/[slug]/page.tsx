@@ -1,22 +1,30 @@
-import { allPosts } from 'contentlayer/generated'
+import { getAllPosts, getPostBySlug, getSortedPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { GiscusComments } from '@/components/comments/giscus'
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const post = allPosts.find((p) => p.slug === params.slug)
+export function generateStaticParams() {
+  return getAllPosts().map((post) => ({
+    slug: post.slug,
+  }))
+}
+
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const post = getPostBySlug(slug)
 
   if (!post) {
     notFound()
   }
 
-  // Find next and previous posts
-  const sortedPosts = allPosts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
-  const currentIndex = sortedPosts.findIndex((p) => p.slug === params.slug)
+  const sortedPosts = getSortedPosts()
+  const currentIndex = sortedPosts.findIndex((p) => p.slug === slug)
   const prevPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null
   const nextPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null
 
@@ -43,7 +51,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
           <div className="mt-4 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <Link key={tag} href={`/tags/${tag}`}>
+              <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`}>
                 <Badge variant="primary">{tag}</Badge>
               </Link>
             ))}
@@ -60,9 +68,41 @@ export default function PostPage({ params }: { params: { slug: string } }) {
         {/* Comments */}
         <Card>
           <CardContent className="pt-6">
-            <GiscusComments slug={params.slug} />
+            <GiscusComments />
           </CardContent>
         </Card>
+
+        {(prevPost || nextPost) && (
+          <nav className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="Post navigation">
+            {prevPost ? (
+              <Link href={`/posts/${prevPost.slug}`}>
+                <Card className="h-full hover:shadow-lg">
+                  <CardContent className="pt-6">
+                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Previous</p>
+                    <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                      {prevPost.title}
+                    </h2>
+                  </CardContent>
+                </Card>
+              </Link>
+            ) : (
+              <div />
+            )}
+
+            {nextPost && (
+              <Link href={`/posts/${nextPost.slug}`} className="sm:text-right">
+                <Card className="h-full hover:shadow-lg">
+                  <CardContent className="pt-6">
+                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Next</p>
+                    <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
+                      {nextPost.title}
+                    </h2>
+                  </CardContent>
+                </Card>
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
     </article>
   )
