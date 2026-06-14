@@ -25,6 +25,7 @@ blog-system/
 │   │   └── page.tsx              # 归档页面
 │   ├── search/
 │   │   └── page.tsx              # 搜索页面
+│   ├── providers.tsx             # next-themes 客户端 Provider
 │   ├── layout.tsx                # 根布局
 │   └── page.tsx                  # 首页
 ├── components/
@@ -46,14 +47,22 @@ blog-system/
 
 ## 🛠️ 技术栈
 
-- **框架**: Next.js 16 (App Router)
+- **框架**: Next.js 16.2.7 (App Router)
 - **语言**: TypeScript
 - **样式**: Tailwind CSS 3.4.x
 - **内容**: Content Collections
 - **搜索**: Algolia (react-instantsearch)
 - **评论**: Giscus
 - **字体**: Geist (苹果风格)
-- **主题**: next-themes (暗黑模式)
+- **主题**: next-themes + Tailwind `darkMode: 'class'`
+
+## 🧭 当前架构状态
+
+- 内容管线是 Content Collections；不要重新引入 Contentlayer / `next-contentlayer`。
+- Markdown 会在生成阶段通过 `remark` / `rehype` 编译为 HTML；当前不使用 Next MDX runtime。
+- `app/providers.tsx` 提供 `next-themes` 的 `ThemeProvider`，Tailwind 使用 class 模式暗黑主题。
+- Giscus public env 缺失时必须降级显示提示，不要用非空断言强行渲染。
+- `next` / `eslint-config-next` 固定为 `16.2.7`。`package.json` 中的 `overrides.next.postcss = 8.5.15` 用于修复 Next 内部 PostCSS audit advisory；该 override 只影响 Next 内部依赖解析，不改变项目自己的 Tailwind/PostCSS 配置。后续 Next 官方修复后再评估是否移除。
 
 ## 🚀 开发
 
@@ -75,6 +84,7 @@ npm run generate:content # 生成内容集合
 - `NEXT_PUBLIC_ALGOLIA_INDEX_NAME` - 索引名称
 - `NEXT_PUBLIC_GISCUS_REPO` - GitHub 仓库 (username/repo)
 - `NEXT_PUBLIC_GISCUS_REPO_ID` - 仓库 ID
+- `NEXT_PUBLIC_GISCUS_CATEGORY` - 讨论分类名称
 - `NEXT_PUBLIC_GISCUS_CATEGORY_ID` - 讨论分类 ID
 
 ## ✨ 功能特性
@@ -88,7 +98,8 @@ npm run generate:content # 生成内容集合
 ✅ 归档页面（按年月分组的时间线）
 ✅ 响应式设计（移动端适配）
 ✅ Algolia 搜索（需要环境变量与索引同步）
-✅ Giscus 评论（需要 GitHub Discussions 配置）
+✅ Giscus 评论（需要 GitHub Discussions 配置；缺 env 时显示降级提示）
+✅ next-themes class 暗黑模式
 
 ## 📝 文章示例
 
@@ -106,7 +117,7 @@ coverImage: ""
 
 # 内容
 
-使用 Markdown 或 MDX 编写...
+使用 Markdown 编写。当前项目不使用 MDX runtime。
 ```
 
 ## 🎨 设计特点

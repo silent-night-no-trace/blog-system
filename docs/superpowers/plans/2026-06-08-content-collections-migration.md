@@ -1,12 +1,14 @@
 # Content Collections Migration Implementation Plan
 
+> Current status after follow-up hardening: active project runs Next.js 16.2.7 with Content Collections, no Next MDX runtime stack, `next-themes` class-based dark mode, Giscus env fallback, and a scoped `overrides.next.postcss = 8.5.15` audit fix. `npm audit --omit=dev --registry=https://registry.npmjs.org` is currently clean. The remaining Contentlayer/MDX snippets below are migration-time context or historical instructions, not current architecture.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the unmaintained Contentlayer pipeline with Content Collections while preserving the current blog behavior, generated post shape, Algolia sync, static routes, and rendered Markdown output.
 
 **Architecture:** Content Collections becomes the single content source. The Next adapter (`withContentCollections`) integrates content generation into Next builds, while the CLI (`content-collections build`) provides an explicit generation command for scripts such as Algolia sync. Application pages read posts through a small `lib/posts.ts` facade so future migrations do not require editing every route again.
 
-**Tech Stack:** Next.js 16.2.x App Router, React 19, TypeScript, Content Collections (`@content-collections/core`, `@content-collections/next`, `@content-collections/cli`, `@content-collections/markdown`), Zod, Algolia v5, Tailwind CSS 3.4.x.
+**Tech Stack:** Next.js 16.2.7 App Router, React 19, TypeScript, Content Collections (`@content-collections/core`, `@content-collections/next`, `@content-collections/cli`, `@content-collections/markdown`), Zod, Algolia v5, Tailwind CSS 3.4.x, next-themes.
 
 **Repository Policy:** Do not commit during implementation unless the user explicitly asks. Treat each checkpoint as a `git diff`/verification checkpoint instead of a commit.
 
@@ -25,7 +27,7 @@ Reasons:
 
 Keep **Velite** as a fallback only if Content Collections cannot reproduce the current Markdown output or fails under Next 16 build/dev. Do not implement both in the same pass.
 
-## Current Findings To Preserve
+## Migration-Time Findings To Preserve
 
 - Current code imports `allPosts` from `contentlayer/generated` in app routes and `lib/posts.ts`.
 - `.contentlayer` is ignored by git; clean builds fail when the generated directory is absent.
@@ -882,7 +884,7 @@ Next.js 16 博客系统 - 苹果设计风格
 In `FINAL_STATUS.md`, `CURRENT_PROGRESS.md`, and `memory/blog-system-progress.md`, update active stack references:
 
 ```md
-- Next.js 16.2.x (App Router)
+- Next.js 16.2.7 (App Router)
 - Tailwind CSS 3.4.x
 - Content Collections
 - Algolia v5
@@ -899,7 +901,7 @@ Where the file describes historical setup, label it explicitly:
 At the top of `docs/superpowers/plans/2026-04-30-blog-system.md`, add:
 
 ```md
-> Historical note: This plan reflects an earlier Contentlayer-based implementation. The active project has migrated to Content Collections. Do not follow the `next-contentlayer`, `withContentlayer`, `next-contentlayer/hooks`, Algolia v4 `initIndex`, or `post.body.code` examples in this document for current work.
+> Historical note: This plan reflects an earlier Contentlayer/MDX-based implementation. The active project now runs Next.js 16.2.7 with Content Collections, Markdown-to-HTML generation, next-themes class dark mode, Giscus env fallback, and no Next MDX runtime stack. Do not follow the `next-contentlayer`, `withContentlayer`, `next-contentlayer/hooks`, Algolia v4 `initIndex`, MDX runtime, or `post.body.code` examples in this document for current work.
 ```
 
 ---

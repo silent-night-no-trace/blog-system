@@ -1,23 +1,60 @@
-import { getAllTags, getPostsByTag } from '@/lib/posts'
+import type { Metadata } from 'next'
+import { getAllTags, getPostsByTag, getTagBySlug } from '@/lib/posts'
 import { notFound } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PostCard } from '@/components/posts/post-card'
 import Link from 'next/link'
+
+type TagPageProps = {
+  params: Promise<{ tag: string }>
+}
 
 export function generateStaticParams() {
   return getAllTags().map((tag) => ({ tag }))
 }
 
-export default async function TagPage({
+export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ tag: string }>
-}) {
+}: TagPageProps): Promise<Metadata> {
   const { tag } = await params
   const decodedTag = decodeURIComponent(tag)
+  const tagSummary = getTagBySlug(decodedTag)
   const posts = getPostsByTag(decodedTag)
 
-  if (posts.length === 0) {
+  if (!tagSummary || posts.length === 0) {
+    return {
+      title: '标签未找到',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
+
+  return {
+    title: `${tagSummary.label} 标签`,
+    description: `浏览 ${posts.length} 篇带有「${tagSummary.label}」标签的文章。`,
+    alternates: {
+      canonical: `/tags/${tagSummary.slug}`,
+    },
+    openGraph: {
+      title: `${tagSummary.label} 标签`,
+      description: `浏览 ${posts.length} 篇带有「${tagSummary.label}」标签的文章。`,
+      url: `/tags/${tagSummary.slug}`,
+      type: 'website',
+    },
+  }
+}
+
+export default async function TagPage({
+  params,
+}: TagPageProps) {
+  const { tag } = await params
+  const decodedTag = decodeURIComponent(tag)
+  const tagSummary = getTagBySlug(decodedTag)
+  const posts = getPostsByTag(decodedTag)
+
+  if (!tagSummary || posts.length === 0) {
     notFound()
   }
 
@@ -30,50 +67,18 @@ export default async function TagPage({
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-              {decodedTag}
+              {tagSummary.label}
             </h1>
             <Badge variant="primary">{posts.length} posts</Badge>
           </div>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Articles tagged with &ldquo;{decodedTag}&rdquo;
+            Articles tagged with &ldquo;{tagSummary.label}&rdquo;
           </p>
         </div>
 
         <div className="space-y-6">
           {posts.map((post) => (
-            <Link key={post._id} href={`/posts/${post.slug}`}>
-              <Card className="group hover:shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="mb-3 flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <Badge key={tag} variant="primary">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <h2 className="mb-2 text-xl font-bold text-zinc-900 group-hover:text-black dark:text-zinc-100 dark:group-hover:text-white">
-                    {post.title}
-                  </h2>
-
-                  <p className="mb-4 text-zinc-600 dark:text-zinc-400">
-                    {post.excerpt}
-                  </p>
-
-                  <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-500">
-                    <time dateTime={post.date}>
-                      {new Date(post.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </time>
-                    <span>·</span>
-                    <span>{post.readingTime} min read</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <PostCard key={post._id} post={post} />
           ))}
         </div>
       </div>

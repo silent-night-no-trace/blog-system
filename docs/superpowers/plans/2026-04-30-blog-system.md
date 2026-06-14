@@ -1,6 +1,10 @@
 # 博客系统实施计划
 
-> Historical note: This plan reflects an earlier Contentlayer-based implementation. The active project has migrated to Content Collections. Do not follow the `next-contentlayer`, `withContentlayer`, `next-contentlayer/hooks`, Algolia v4 `initIndex`, or `post.body.code` examples in this document for current work.
+> [!WARNING]
+> Archived historical plan. This document describes the original Next.js 15 + Contentlayer + MDX-runtime approach and must not be used for current implementation work.
+> Current architecture is Next.js 16.2.7 + Content Collections + Markdown-to-HTML generation, with no Next MDX runtime stack.
+
+> Historical note: This plan reflects an earlier Contentlayer/MDX-based implementation. The active project now runs Next.js 16.2.7 with Content Collections, Markdown-to-HTML generation, next-themes class dark mode, Giscus env fallback, and no Next MDX runtime stack. Do not follow the `next-contentlayer`, `withContentlayer`, `next-contentlayer/hooks`, Algolia v4 `initIndex`, MDX runtime, or `post.body.code` examples in this document for current work.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

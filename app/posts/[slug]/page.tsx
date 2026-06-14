@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+import Image from 'next/image'
 import { getAllPosts, getPostBySlug, getSortedPosts } from '@/lib/posts'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
@@ -5,17 +7,57 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { GiscusComments } from '@/components/comments/giscus'
 
+type PostPageProps = {
+  params: Promise<{ slug: string }>
+}
+
 export function generateStaticParams() {
   return getAllPosts().map((post) => ({
     slug: post.slug,
   }))
 }
 
+export async function generateMetadata({
+  params,
+}: PostPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = getPostBySlug(slug)
+
+  if (!post) {
+    return {
+      title: '文章未找到',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: {
+      canonical: post.url,
+    },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: post.url,
+      type: 'article',
+      publishedTime: post.date,
+      tags: post.tags,
+    },
+    twitter: {
+      card: 'summary',
+      title: post.title,
+      description: post.excerpt,
+    },
+  }
+}
+
 export default async function PostPage({
   params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+}: PostPageProps) {
   const { slug } = await params
   const post = getPostBySlug(slug)
 
@@ -58,6 +100,19 @@ export default async function PostPage({
           </div>
         </header>
 
+        {post.coverImage ? (
+          <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-3xl border border-zinc-100 bg-zinc-100 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <Image
+              src={post.coverImage}
+              alt={`${post.title} 封面图`}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
+              unoptimized={post.coverImage.endsWith('.svg')}
+            />
+          </div>
+        ) : null}
+
         {/* Post content */}
         <Card className="mb-8">
           <CardContent className="prose prose-zinc max-w-none dark:prose-invert prose-headings:font-bold prose-headings:text-zinc-900 dark:prose-headings:text-zinc-100 prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-xl prose-pre:bg-zinc-900 prose-pre:text-zinc-100 dark:prose-pre:bg-zinc-800 dark:prose-pre:text-zinc-100 prose-blockquote:border-l-4 prose-blockquote:border-zinc-300 dark:prose-blockquote:border-zinc-700">
@@ -75,7 +130,10 @@ export default async function PostPage({
         {(prevPost || nextPost) && (
           <nav className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="Post navigation">
             {prevPost ? (
-              <Link href={`/posts/${prevPost.slug}`}>
+              <Link
+                href={`/posts/${prevPost.slug}`}
+                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-zinc-100 dark:focus-visible:ring-offset-zinc-950"
+              >
                 <Card className="h-full hover:shadow-lg">
                   <CardContent className="pt-6">
                     <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Previous</p>
@@ -90,7 +148,10 @@ export default async function PostPage({
             )}
 
             {nextPost && (
-              <Link href={`/posts/${nextPost.slug}`} className="sm:text-right">
+              <Link
+                href={`/posts/${nextPost.slug}`}
+                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 sm:text-right dark:focus-visible:ring-zinc-100 dark:focus-visible:ring-offset-zinc-950"
+              >
                 <Card className="h-full hover:shadow-lg">
                   <CardContent className="pt-6">
                     <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Next</p>

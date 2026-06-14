@@ -1,6 +1,15 @@
+import type { Metadata } from 'next'
 import { getTagsWithCounts } from '@/lib/posts'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: '标签',
+  description: '按标签浏览博客文章。',
+  alternates: {
+    canonical: '/tags',
+  },
+}
 
 export default function TagsPage() {
   const tags = getTagsWithCounts()
@@ -18,10 +27,10 @@ export default function TagsPage() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {tags.map(([tag, count]) => (
-            <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`}>
+          {tags.map((tag) => (
+            <Link key={tag.slug} href={`/tags/${tag.slug}`}>
               <Badge variant="primary" className="px-4 py-2 text-sm hover:opacity-80 transition-opacity">
-                {tag} <span className="ml-1 opacity-75">({count})</span>
+                {tag.label} <span className="ml-1 opacity-75">({tag.count})</span>
               </Badge>
             </Link>
           ))}

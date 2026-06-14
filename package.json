@@ -4,11 +4,14 @@
   "private": true,
   "scripts": {
     "generate:content": "content-collections build",
+    "validate:content": "npm run generate:content && tsx scripts/validate-content.ts",
     "sync:algolia": "npm run generate:content && tsx scripts/sync-algolia.ts",
     "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run validate:content && npm run lint && npm run typecheck && npm run build && npm run sync:algolia -- --dry-run"
   },
   "dependencies": {
     "@algolia/client-search": "^5.52.0",
@@ -17,7 +20,7 @@
     "class-variance-authority": "^0.7.1",
     "highlight.js": "^11.11.1",
     "lucide-react": "^1.14.0",
-    "next": "16.2.4",
+    "next": "16.2.7",
     "next-themes": "^0.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -32,19 +35,22 @@
     "@content-collections/core": "^0.15.1",
     "@content-collections/markdown": "^0.1.4",
     "@content-collections/next": "^0.2.11",
-    "@mdx-js/react": "^2.3.0",
-    "@next/mdx": "^16.2.6",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "16.2.7",
     "postcss": "^8.5.14",
     "tailwindcss": "^3.4.19",
     "tsx": "^4.21.0",
     "typescript": "^5",
     "zod": "^3.25.76"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.15"
+    }
   }
 }

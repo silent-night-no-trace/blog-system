@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 
 export function Header() {
   return (
@@ -28,10 +28,11 @@ export function Header() {
           >
             Archive
           </Link>
-          <Link href="/search">
-            <Button variant="ghost" size="sm">
-              Search
-            </Button>
+          <Link
+            href="/search"
+            className={buttonVariants({ variant: 'ghost', size: 'sm' })}
+          >
+            Search
           </Link>
         </nav>
       </div>

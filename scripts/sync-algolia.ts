@@ -1,6 +1,7 @@
 import { algoliasearch } from 'algoliasearch'
 import { loadEnvConfig } from '@next/env'
 import { allPosts } from 'content-collections'
+import { normalizeTag } from '../lib/posts'
 
 type ContentPost = (typeof allPosts)[number]
 
@@ -10,6 +11,7 @@ type AlgoliaPostRecord = {
   slug: string
   date: string
   tags: string[]
+  tagSlugs: string[]
   excerpt: string
   content: string
   readingTime: number
@@ -17,6 +19,7 @@ type AlgoliaPostRecord = {
 
 const DRY_RUN_FLAG = '--dry-run'
 const REPLACE_FLAG = '--replace'
+const SEARCH_CONTENT_MAX_LENGTH = 5000
 
 loadEnvConfig(process.cwd())
 
@@ -34,6 +37,27 @@ function getIndexName() {
   return process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'blog_posts'
 }
 
+function cleanSearchContent(content: string) {
+  return content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+    .replace(/[#>*_~\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function getSearchContent(content: string) {
+  const cleaned = cleanSearchContent(content)
+
+  if (cleaned.length <= SEARCH_CONTENT_MAX_LENGTH) {
+    return cleaned
+  }
+
+  return `${cleaned.slice(0, SEARCH_CONTENT_MAX_LENGTH).trimEnd()}...`
+}
+
 function toAlgoliaRecord(post: ContentPost): AlgoliaPostRecord {
   return {
     objectID: post.slug,
@@ -41,8 +65,9 @@ function toAlgoliaRecord(post: ContentPost): AlgoliaPostRecord {
     slug: post.slug,
     date: post.date,
     tags: post.tags,
+    tagSlugs: Array.from(new Set(post.tags.map(normalizeTag).filter(Boolean))),
     excerpt: post.excerpt,
-    content: post.body.raw,
+    content: getSearchContent(post.body.raw),
     readingTime: post.readingTime,
   }
 }
@@ -54,7 +79,13 @@ async function syncToAlgolia() {
     .map(toAlgoliaRecord)
 
   if (process.argv.includes(DRY_RUN_FLAG)) {
+    const totalContentChars = records.reduce(
+      (total, record) => total + record.content.length,
+      0
+    )
+
     console.log(`Prepared ${records.length} records for Algolia index "${indexName}".`)
+    console.log(`Total searchable content: ${totalContentChars} chars.`)
     return
   }
 
@@ -76,10 +107,10 @@ async function syncToAlgolia() {
 
   const settingsTask = await client.setSettings({
     indexName,
-    indexSettings: {
-      searchableAttributes: ['title', 'content', 'tags', 'excerpt'],
-      attributesForFaceting: ['tags'],
-    },
+      indexSettings: {
+        searchableAttributes: ['title', 'content', 'tags', 'excerpt'],
+        attributesForFaceting: ['tags', 'tagSlugs'],
+      },
   })
   await client.waitForTask({ indexName, taskID: settingsTask.taskID })
 

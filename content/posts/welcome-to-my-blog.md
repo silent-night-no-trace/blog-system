@@ -4,7 +4,7 @@ slug: welcome-to-my-blog
 date: 2026-04-30
 tags: ["博客", "介绍", "Next.js"]
 excerpt: "这是一个使用 Next.js 16 构建的精美博客系统，支持 Markdown、搜索、标签等功能。"
-coverImage: "/images/welcome.jpg"
+coverImage: "/images/welcome.svg"
 ---
 
 # 欢迎来到我的博客

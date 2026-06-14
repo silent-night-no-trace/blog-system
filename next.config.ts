@@ -6,12 +6,12 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
   images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: '**' },
+    localPatterns: [
+      {
+        pathname: '/images/**',
+        search: '',
+      },
     ],
-  },
-  experimental: {
-    mdxRs: true,
   },
 };
 

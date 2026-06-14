@@ -2,6 +2,12 @@ import { allPosts, type Post } from 'content-collections'
 
 export type { Post }
 
+export type TagSummary = {
+  label: string
+  slug: string
+  count: number
+}
+
 export type ArchiveGroup = {
   year: number
   months: {
@@ -24,30 +30,88 @@ export function getPostBySlug(slug: string) {
   return allPosts.find((post) => post.slug === slug)
 }
 
-export function getPostsByTag(tag: string) {
-  return getSortedPosts().filter((post) => post.tags.includes(tag))
+export function normalizeTag(tag: string) {
+  return tag
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\./g, '')
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }
 
-export function getAllTags() {
-  const tags = new Set<string>()
+function getTagSummariesMap() {
+  const tagsMap = new Map<string, TagSummary>()
 
-  allPosts.forEach((post) => {
-    post.tags.forEach((tag) => tags.add(tag))
-  })
+  const getLabelScore = (tag: string) => {
+    let score = tag.length
 
-  return Array.from(tags).sort()
-}
+    if (/[A-Z]/.test(tag)) {
+      score += 10
+    }
 
-export function getTagsWithCounts() {
-  const tagsMap = new Map<string, number>()
+    if (/[^a-z0-9\u4e00-\u9fff]/i.test(tag)) {
+      score += 10
+    }
+
+    return score
+  }
 
   allPosts.forEach((post) => {
     post.tags.forEach((tag) => {
-      tagsMap.set(tag, (tagsMap.get(tag) || 0) + 1)
+      const slug = normalizeTag(tag)
+
+      if (!slug) {
+        return
+      }
+
+      const existing = tagsMap.get(slug)
+      if (existing) {
+        existing.count += 1
+
+        if (getLabelScore(tag) > getLabelScore(existing.label)) {
+          existing.label = tag
+        }
+
+        return
+      }
+
+      tagsMap.set(slug, {
+        label: tag,
+        slug,
+        count: 1,
+      })
     })
   })
 
-  return Array.from(tagsMap.entries()).sort((a, b) => b[1] - a[1])
+  return tagsMap
+}
+
+export function getPostsByTag(tag: string) {
+  const normalizedTag = normalizeTag(tag)
+
+  return getSortedPosts().filter((post) =>
+    post.tags.some((postTag) => normalizeTag(postTag) === normalizedTag)
+  )
+}
+
+export function getAllTags() {
+  return getTagsWithCounts().map((tag) => tag.slug)
+}
+
+export function getTagBySlug(tag: string) {
+  return getTagSummariesMap().get(normalizeTag(tag))
+}
+
+export function getTagsWithCounts(): TagSummary[] {
+  return Array.from(getTagSummariesMap().values()).sort((a, b) => {
+    if (b.count !== a.count) {
+      return b.count - a.count
+    }
+
+    return a.label.localeCompare(b.label)
+  })
 }
 
 export function getArchive(): ArchiveGroup[] {

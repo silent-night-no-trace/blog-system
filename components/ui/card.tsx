@@ -1,5 +1,3 @@
-'use client'
-
 import { cva } from 'class-variance-authority'
 
 export const cardVariants = cva(
