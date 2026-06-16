@@ -19,10 +19,10 @@ export default function TagsPage() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            Tags
+            标签
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            {tags.length} tags found
+            共 {tags.length} 个标签
           </p>
         </div>
 

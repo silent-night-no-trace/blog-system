@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getAllPosts, getArchive } from '@/lib/posts'
+import { formatMonth } from '@/lib/site'
 import { Badge } from '@/components/ui/badge'
 import { PostCard } from '@/components/posts/post-card'
 
@@ -19,10 +20,10 @@ export default function ArchivePage() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            Archive
+            归档
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            {getAllPosts().length} articles in total
+            共 {getAllPosts().length} 篇文章
           </p>
         </div>
 
@@ -37,7 +38,7 @@ export default function ArchivePage() {
                 {yearGroup.months.map((monthGroup) => (
                   <div key={monthGroup.month}>
                     <h3 className="mb-4 text-lg font-semibold text-zinc-700 dark:text-zinc-300">
-                      {new Date(2000, monthGroup.month - 1).toLocaleString('en-US', { month: 'long' })}
+                      {formatMonth(monthGroup.month)}
                       {' '}
                       <Badge variant="default" className="ml-2">
                         {monthGroup.posts.length}

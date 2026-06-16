@@ -18,10 +18,10 @@ export default function PostsPage() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            All Posts
+            全部文章
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            {posts.length} articles
+            共 {posts.length} 篇文章
           </p>
         </div>
 

@@ -12,6 +12,11 @@ function escapeXml(value: string) {
     .replace(/'/g, '&apos;')
 }
 
+function wrapCdata(value: string) {
+  // Split any literal CDATA terminator so the payload can't break out of the section.
+  return `<![CDATA[${value.replace(/]]>/g, ']]]]><![CDATA[>')}]]>`
+}
+
 export async function GET() {
   const posts = getSortedPosts()
   const latestPost = posts[0]
@@ -28,6 +33,7 @@ export async function GET() {
       <link>${escapeXml(url)}</link>
       <guid>${escapeXml(url)}</guid>
       <description>${escapeXml(post.excerpt)}</description>
+      <content:encoded>${wrapCdata(post.body.html)}</content:encoded>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
 ${categories}
     </item>`
@@ -35,7 +41,7 @@ ${categories}
     .join('\n')
 
   const feed = `<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>${escapeXml(siteConfig.name)}</title>
     <link>${escapeXml(getAbsoluteUrl('/'))}</link>

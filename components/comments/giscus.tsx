@@ -80,7 +80,13 @@ export function GiscusComments() {
           reactionsEnabled="1"
           emitMetadata="0"
           inputPosition="top"
-          theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
+          theme={
+            resolvedTheme === 'dark'
+              ? 'dark'
+              : resolvedTheme === 'light'
+                ? 'light'
+                : 'preferred_color_scheme'
+          }
           lang="zh-CN"
           loading="lazy"
         />

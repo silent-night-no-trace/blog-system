@@ -63,16 +63,16 @@ export default async function TagPage({
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link href="/tags" className="mb-4 inline-block text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">
-            ← All Tags
+            ← 全部标签
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
               {tagSummary.label}
             </h1>
-            <Badge variant="primary">{posts.length} posts</Badge>
+            <Badge variant="primary">{posts.length} 篇文章</Badge>
           </div>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Articles tagged with &ldquo;{tagSummary.label}&rdquo;
+            带有「{tagSummary.label}」标签的文章
           </p>
         </div>
 

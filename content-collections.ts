@@ -7,6 +7,8 @@ import remarkGfm from 'remark-gfm'
 import { z } from 'zod'
 
 const wordsPerMinute = 200
+const cjkCharsPerMinute = 350
+const cjkPattern = /[一-鿿぀-ヿ가-힯]/g
 
 function toIsoDate(value: string | Date) {
   return new Date(value).toISOString()
@@ -40,8 +42,13 @@ async function assertUniqueSlug(slug: string, context: { collection: { documents
 }
 
 function getReadingTime(content: string) {
-  const words = content.trim().split(/\s+/).filter(Boolean).length
-  return Math.max(1, Math.ceil(words / wordsPerMinute))
+  // CJK text has no word boundaries, so splitting on whitespace would count a
+  // whole Chinese article as one "word". Count CJK characters and non-CJK words
+  // separately and combine at their respective reading speeds.
+  const cjkChars = (content.match(cjkPattern) || []).length
+  const words = content.replace(cjkPattern, ' ').trim().split(/\s+/).filter(Boolean).length
+  const minutes = cjkChars / cjkCharsPerMinute + words / wordsPerMinute
+  return Math.max(1, Math.ceil(minutes))
 }
 
 const posts = defineCollection({

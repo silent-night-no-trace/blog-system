@@ -14,25 +14,25 @@ export function Header() {
             href="/posts"
             className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
           >
-            Posts
+            文章
           </Link>
           <Link
             href="/tags"
             className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
           >
-            Tags
+            标签
           </Link>
           <Link
             href="/archive"
             className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
           >
-            Archive
+            归档
           </Link>
           <Link
             href="/search"
             className={buttonVariants({ variant: 'ghost', size: 'sm' })}
           >
-            Search
+            搜索
           </Link>
         </nav>
       </div>

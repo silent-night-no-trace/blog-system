@@ -6,6 +6,7 @@ import type { Hit as AlgoliaHit } from 'instantsearch.js'
 import Link from 'next/link'
 import { AlertCircle, FileSearch, Loader2, SearchIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { formatDate, formatReadingTime } from '@/lib/site'
 
 type BlogSearchHit = {
   title: string
@@ -45,14 +46,10 @@ function Hit({ hit }: { hit: AlgoliaHit<BlogSearchHit> }) {
 
         <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-500">
           <time dateTime={hit.date}>
-            {new Date(hit.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+            {formatDate(hit.date)}
           </time>
           <span>·</span>
-          <span>{hit.readingTime} min read</span>
+          <span>{formatReadingTime(hit.readingTime)}</span>
         </div>
       </div>
     </Link>
@@ -70,10 +67,10 @@ function SearchResults() {
       <div className="rounded-2xl border border-zinc-100 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <SearchIcon className="mx-auto mb-3 h-6 w-6 text-zinc-400" aria-hidden="true" />
         <h2 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          Start searching
+          开始搜索
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Type a keyword to search article titles, excerpts, tags, and content.
+          输入关键词以搜索文章标题、摘要、标签和正文。
         </p>
       </div>
     )
@@ -84,10 +81,10 @@ function SearchResults() {
       <div className="rounded-2xl border border-red-100 bg-red-50 px-6 py-12 text-center dark:border-red-900/50 dark:bg-red-950/20">
         <AlertCircle className="mx-auto mb-3 h-6 w-6 text-red-500 dark:text-red-300" aria-hidden="true" />
         <h2 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          Search is temporarily unavailable
+          搜索暂时不可用
         </h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          {error?.message || 'Please try again later.'}
+          {error?.message || '请稍后再试。'}
         </p>
       </div>
     )
@@ -101,9 +98,9 @@ function SearchResults() {
         className="rounded-2xl border border-zinc-100 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
       >
         <Loader2 className="mx-auto mb-3 h-6 w-6 animate-spin text-zinc-400" aria-hidden="true" />
-        <p className="font-medium text-zinc-900 dark:text-zinc-100">Searching...</p>
+        <p className="font-medium text-zinc-900 dark:text-zinc-100">搜索中…</p>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Looking for articles matching <q>{query}</q>.
+          正在查找与 <q>{query}</q> 匹配的文章。
         </p>
       </div>
     )
@@ -114,10 +111,10 @@ function SearchResults() {
       <div className="rounded-2xl border border-zinc-100 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <FileSearch className="mx-auto mb-3 h-6 w-6 text-zinc-400" aria-hidden="true" />
         <h2 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          No results found
+          未找到结果
         </h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Try different keywords or check the spelling.
+          换个关键词或检查拼写后再试。
         </p>
       </div>
     )
@@ -126,7 +123,7 @@ function SearchResults() {
   return (
     <>
       <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400" aria-live="polite">
-        Found {results.nbHits.toLocaleString('en-US')} {results.nbHits === 1 ? 'result' : 'results'} for <q>{query}</q>.
+        找到 {results.nbHits.toLocaleString('zh-CN')} 个与 <q>{query}</q> 匹配的结果。
       </p>
 
       <div className="space-y-6">
@@ -149,10 +146,10 @@ export function SearchClient() {
       <div className="py-12">
         <div className="mx-auto max-w-2xl px-4 text-center sm:px-6 lg:px-8">
           <h1 className="mb-3 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-            Search is not configured
+            搜索未配置
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400">
-            Configure Algolia environment variables to enable article search.
+            配置 Algolia 环境变量后即可启用文章搜索。
           </p>
         </div>
       </div>
@@ -164,10 +161,10 @@ export function SearchClient() {
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-            Search
+            搜索
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-            Search articles by title, excerpt, tags, or content.
+            按标题、摘要、标签或正文搜索文章。
           </p>
         </div>
 
@@ -176,10 +173,10 @@ export function SearchClient() {
           indexName={algoliaIndexName}
         >
           <SearchBox
-            placeholder="Search articles..."
+            placeholder="搜索文章…"
             translations={{
-              submitButtonTitle: 'Submit search',
-              resetButtonTitle: 'Clear search query',
+              submitButtonTitle: '提交搜索',
+              resetButtonTitle: '清除搜索词',
             }}
             classNames={{
               root: 'mb-8',

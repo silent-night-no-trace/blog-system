@@ -18,7 +18,6 @@ type AlgoliaPostRecord = {
 }
 
 const DRY_RUN_FLAG = '--dry-run'
-const REPLACE_FLAG = '--replace'
 const SEARCH_CONTENT_MAX_LENGTH = 5000
 
 loadEnvConfig(process.cwd())
@@ -94,25 +93,29 @@ async function syncToAlgolia() {
     getRequiredEnv('ALGOLIA_ADMIN_KEY')
   )
 
-  if (process.argv.includes(REPLACE_FLAG)) {
-    const clearTask = await client.clearObjects({ indexName })
-    await client.waitForTask({ indexName, taskID: clearTask.taskID })
-  }
-
-  await client.saveObjects({
-    indexName,
-    objects: records,
-    waitForTasks: true,
-  })
-
+  // Settings are written first so replaceAllObjects copies them onto the
+  // temporary index it creates. queryLanguages/indexLanguages tune CJK
+  // relevance for a primarily Chinese blog.
   const settingsTask = await client.setSettings({
     indexName,
-      indexSettings: {
-        searchableAttributes: ['title', 'content', 'tags', 'excerpt'],
-        attributesForFaceting: ['tags', 'tagSlugs'],
-      },
+    indexSettings: {
+      searchableAttributes: ['title', 'content', 'tags', 'excerpt'],
+      attributesForFaceting: ['tags', 'tagSlugs'],
+      queryLanguages: ['zh'],
+      indexLanguages: ['zh'],
+      ignorePlurals: true,
+      removeWordsIfNoResults: 'allOptional',
+    },
   })
   await client.waitForTask({ indexName, taskID: settingsTask.taskID })
+
+  // Atomic full reindex: imports into a temp index then moves it over the
+  // production index, so records for deleted posts are removed and there is
+  // no empty-index window for live searches.
+  await client.replaceAllObjects({
+    indexName,
+    objects: records,
+  })
 
   console.log(`Synced ${records.length} posts to Algolia index "${indexName}".`)
 }

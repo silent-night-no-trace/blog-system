@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { getAllPosts, getPostBySlug, getSortedPosts } from '@/lib/posts'
+import { getAllPosts, getPostBySlug, getSortedPosts, normalizeTag } from '@/lib/posts'
+import { formatDate, formatReadingTime } from '@/lib/site'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -81,19 +82,15 @@ export default async function PostPage({
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 dark:text-zinc-500">
             <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatDate(post.date)}
             </time>
             <span>·</span>
-            <span>{post.readingTime} min read</span>
+            <span>{formatReadingTime(post.readingTime)}</span>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
-              <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`}>
+              <Link key={tag} href={`/tags/${normalizeTag(tag)}`}>
                 <Badge variant="primary">{tag}</Badge>
               </Link>
             ))}
@@ -128,7 +125,7 @@ export default async function PostPage({
         </Card>
 
         {(prevPost || nextPost) && (
-          <nav className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="Post navigation">
+          <nav className="mt-8 grid gap-4 sm:grid-cols-2" aria-label="文章导航">
             {prevPost ? (
               <Link
                 href={`/posts/${prevPost.slug}`}
@@ -136,7 +133,7 @@ export default async function PostPage({
               >
                 <Card className="h-full hover:shadow-lg">
                   <CardContent className="pt-6">
-                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Previous</p>
+                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">上一篇</p>
                     <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
                       {prevPost.title}
                     </h2>
@@ -154,7 +151,7 @@ export default async function PostPage({
               >
                 <Card className="h-full hover:shadow-lg">
                   <CardContent className="pt-6">
-                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">Next</p>
+                    <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-500">下一篇</p>
                     <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">
                       {nextPost.title}
                     </h2>

@@ -2,18 +2,11 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Post } from '@/lib/posts'
+import { formatDate, formatReadingTime } from '@/lib/site'
 
 type PostCardProps = {
   post: Post
   variant?: 'default' | 'compact'
-}
-
-function formatPostDate(date: string, variant: NonNullable<PostCardProps['variant']>) {
-  return new Date(date).toLocaleDateString('en-US',
-    variant === 'compact'
-      ? { month: 'short', day: 'numeric' }
-      : { year: 'numeric', month: 'long', day: 'numeric' }
-  )
 }
 
 export function PostCard({ post, variant = 'default' }: PostCardProps) {
@@ -52,10 +45,10 @@ export function PostCard({ post, variant = 'default' }: PostCardProps) {
 
           <div className={`flex items-center gap-4 text-zinc-500 dark:text-zinc-500 ${isCompact ? 'text-sm' : 'text-sm'}`}>
             <time dateTime={post.date}>
-              {formatPostDate(post.date, variant)}
+              {formatDate(post.date, isCompact ? 'compact' : 'full')}
             </time>
             <span>·</span>
-            <span>{post.readingTime} min read</span>
+            <span>{formatReadingTime(post.readingTime)}</span>
           </div>
         </CardContent>
       </Card>
