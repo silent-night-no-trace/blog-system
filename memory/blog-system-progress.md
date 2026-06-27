@@ -4,11 +4,17 @@ description: 博客系统项目当前进度
 type: project
 ---
 
-**当前状态**：阶段 1-7 优化已完成。当前实现是 Next.js 16.2.7 + Content Collections；不使用 Next MDX runtime；Markdown 由 Content Collections + remark/rehype 编译为 HTML。主题通过 next-themes + Tailwind `darkMode: 'class'` 接入。Giscus 缺 public env 时显示降级提示，运行时错误有边界兜底。
+**当前状态**：阶段 1-7 优化 + 第二轮缺陷修复（2026-06-27）已完成。当前实现是 Next.js 16.2.7 + Content Collections；不使用 Next MDX runtime；Markdown 由 Content Collections + remark/rehype 编译为 HTML，并经 `rehype-sanitize` 净化（sanitize → highlight 顺序，保留 `hljs` 高亮 class）。主题通过 next-themes + Tailwind `darkMode: 'class'` 接入。Giscus 缺 public env 时显示降级提示，运行时错误有边界兜底。`dev` 与 `build` 均使用 Turbopack。
+
+**日期处理**：`Post.date` 以 date-only (`YYYY-MM-DD`) 存储。显示与归档分组必须用 `lib/site.ts` 的 `parsePostDate`（按 year/month/day 分量构造 `Date`），不要用 `new Date(post.date)`——date-only ISO 会被当作 UTC 午夜，跨时区会漂移到前一天。
+
+**标签规范化**：`normalizeTag` 保留 ASCII 与中日韩 CJK（含平假名/片假名/谚文）；Hangul 经 NFKD 分解后用 NFC 重组回首节。不要收窄该范围，否则日韩标签会被静默丢弃。
+
+**测试**：纯函数有 vitest 单测覆盖（`normalizeTag`、`getArchive`、`getReadingTime`、`cleanSearchContent`）。`getReadingTime` 与 `cleanSearchContent` 已抽取到 `lib/reading-time.ts` 和 `lib/search-content.ts`，分别被 `content-collections.ts` 和 `scripts/sync-algolia.ts` 复用。`getArchive` 接受可选 `posts` 入参以便用合成数据测试。
 
 **安全状态**：`next` / `eslint-config-next` 固定为 `16.2.7`。`package.json` 使用 `overrides.next.postcss = 8.5.15` 修复 Next 内部 PostCSS audit advisory；该 override 只影响 Next 内部依赖解析，不改变项目自己的 Tailwind/PostCSS 配置。`npm audit --omit=dev --registry=https://registry.npmjs.org` 当前为 0 漏洞。后续 Next 官方内置修复后，应评估移除该 override。
 
-**最新验证**：最近一次完整验证命令是 `npm run verify`，包含 `validate:content`、`lint`、`typecheck`、`build`、`sync:algolia -- --dry-run`。结果通过；生产构建生成 22 个静态页面；Algolia dry-run 准备 3 条记录，搜索正文总计 968 chars。
+**最新验证**：最近一次完整验证命令是 `npm run verify`，包含 `validate:content`、`lint`、`typecheck`、`test`、`build`、`sync:algolia -- --dry-run`。结果通过；vitest 22 个用例通过；生产构建生成 22 个静态页面；Algolia dry-run 准备 3 条记录，搜索正文总计 968 chars。
 
 ## 当前阶段 1-7 完成摘要
 
@@ -20,6 +26,18 @@ type: project
 6. **独立内容校验、Algolia tagSlugs、RSS Atom/category**：已完成。新增 `scripts/validate-content.ts` 和 `npm run validate:content`；Algolia records 增加 `tagSlugs` facet；RSS 增加 `atom:link` self link 和文章 `<category>`。
 7. **一键验证**：已完成。新增 `npm run typecheck` 和 `npm run verify`；`verify` 串起内容校验、ESLint、TypeScript、生产构建和 Algolia dry-run。
 
+## 第二轮缺陷修复（2026-06-27）
+
+1. **Markdown HTML 净化**：`content-collections.ts` 加 `rehype-sanitize`，顺序 sanitize → highlight，剥离 raw HTML/危险属性并保留 `hljs` 高亮 class。
+2. **日期时区**：`toIsoDate` 改返回 date-only；新增 `lib/site.parsePostDate` 按 Y/M/D 分量构造；`getArchive` 改用之，跨时区不漂移。
+3. **prev/next 语义**：`app/posts/[slug]/page.tsx` 改为按时间顺序（更早=上一篇、更新=下一篇）。
+4. **日韩标签**：`normalizeTag` 保留范围扩至平假名/片假名/谚文，加 NFC 重组 Hangul。
+5. **死代码**：删除 `components/ui/container.tsx`。
+6. **UI 变体精简**：Button 删 secondary/outline/lg；Badge 删 success/warning/destructive；Card 删 bordered/elevated + 未用的 CardHeader/CardFooter。
+7. **单元测试**：引入 vitest；抽取 `lib/reading-time.ts`、`lib/search-content.ts`；`getArchive` 改为可入参；22 个用例。`verify` 加入 `test` 步骤。
+8. **移动端 Header**：改为客户端组件，hamburger 菜单（aria-expanded/controls、resize 自动收起、点击关闭）。
+9. **打包器统一**：`dev` 由 `next dev --webpack` 改为 `next dev`（Turbopack），与 build 一致。
+
 ## 当前可用命令
 
 - `npm run dev`
@@ -27,6 +45,7 @@ type: project
 - `npm run validate:content`
 - `npm run lint`
 - `npm run typecheck`
+- `npm run test`
 - `npm run build`
 - `npm run sync:algolia -- --dry-run`
 - `npm run verify`
@@ -149,7 +168,7 @@ type: project
 - ✅ Tailwind CSS - 版本 3.4.x
 - ✅ Content Collections - 版本 0.15.x
 - ✅ React - 版本 19.2.4
-- ✅ Markdown HTML 生成 - remark-gfm, rehype-highlight
+- ✅ Markdown HTML 生成 - remark-gfm, rehype-sanitize, rehype-highlight
 - ✅ Algolia - 已安装并通过 dry-run 验证
 - ✅ Giscus - 已集成，需要 GitHub Discussions 配置；缺 public env 时显示降级提示
 - ✅ next-themes - 已通过 class 模式接入暗黑主题

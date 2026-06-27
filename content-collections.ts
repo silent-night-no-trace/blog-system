@@ -3,15 +3,25 @@ import { compileMarkdown } from '@content-collections/markdown'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import rehypeHighlight from 'rehype-highlight'
+import rehypeSanitize from 'rehype-sanitize'
 import remarkGfm from 'remark-gfm'
 import { z } from 'zod'
+import { getReadingTime } from './lib/reading-time'
 
-const wordsPerMinute = 200
-const cjkCharsPerMinute = 350
-const cjkPattern = /[一-鿿぀-ヿ가-힯]/g
-
+// Frontmatter dates are date-only (YYYY-MM-DD). Keep them as date-only
+// strings instead of converting to ISO UTC — `new Date('YYYY-MM-DD')` is
+// parsed as UTC midnight, which would shift the displayed day in other
+// timezones. Downstream code parses via lib/site.parsePostDate, which
+// constructs from Y/M/D components so the calendar date is timezone-stable.
 function toIsoDate(value: string | Date) {
-  return new Date(value).toISOString()
+  if (value instanceof Date) {
+    const year = value.getFullYear()
+    const month = String(value.getMonth() + 1).padStart(2, '0')
+    const day = String(value.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  return value.split('T')[0]
 }
 
 function validatePostDate(value: string | Date) {
@@ -41,16 +51,6 @@ async function assertUniqueSlug(slug: string, context: { collection: { documents
   }
 }
 
-function getReadingTime(content: string) {
-  // CJK text has no word boundaries, so splitting on whitespace would count a
-  // whole Chinese article as one "word". Count CJK characters and non-CJK words
-  // separately and combine at their respective reading speeds.
-  const cjkChars = (content.match(cjkPattern) || []).length
-  const words = content.replace(cjkPattern, ' ').trim().split(/\s+/).filter(Boolean).length
-  const minutes = cjkChars / cjkCharsPerMinute + words / wordsPerMinute
-  return Math.max(1, Math.ceil(minutes))
-}
-
 const posts = defineCollection({
   name: 'posts',
   typeName: 'Post',
@@ -70,7 +70,10 @@ const posts = defineCollection({
 
     const html = await compileMarkdown(context, document, {
       remarkPlugins: [remarkGfm],
-      rehypePlugins: [rehypeHighlight],
+      // Sanitize before highlighting: strip raw/dangerous HTML first, then let
+      // rehype-highlight add `hljs` spans afterwards (un-sanitized, so the
+      // highlighting classes survive to the final HTML).
+      rehypePlugins: [rehypeSanitize, rehypeHighlight],
     })
 
     return {

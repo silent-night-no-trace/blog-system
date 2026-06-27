@@ -12,8 +12,23 @@ export function getAbsoluteUrl(path: string) {
   return new URL(path, siteUrl).toString()
 }
 
+// Parse a post date that is stored as a date-only string (YYYY-MM-DD) or a
+// Date, returning a Date built from year/month/day components. This avoids
+// the timezone drift of `new Date('YYYY-MM-DD')`, which ES parses as UTC
+// midnight and can render as the previous calendar day in negative offsets.
+export function parsePostDate(value: string | Date): Date {
+  if (value instanceof Date) {
+    return value
+  }
+
+  const [datePart] = value.split('T')
+  const [year, month, day] = datePart.split('-').map(Number)
+
+  return new Date(year, (month || 1) - 1, day || 1)
+}
+
 export function formatDate(value: string | Date, variant: 'full' | 'compact' = 'full') {
-  return new Date(value).toLocaleDateString(
+  return parsePostDate(value).toLocaleDateString(
     'zh-CN',
     variant === 'compact'
       ? { month: 'long', day: 'numeric' }

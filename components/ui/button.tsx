@@ -7,17 +7,12 @@ export const buttonVariants = cva(
       variant: {
         primary:
           'bg-black text-white hover:bg-zinc-900 dark:bg-zinc-50 dark:text-black dark:hover:bg-zinc-100',
-        secondary:
-          'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700',
-        outline:
-          'border border-zinc-200 bg-transparent hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900',
         ghost:
           'bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900',
       },
       size: {
         sm: 'h-8 px-3 text-sm',
         md: 'h-10 px-4',
-        lg: 'h-12 px-6 text-lg',
       },
     },
     defaultVariants: {
@@ -29,8 +24,8 @@ export const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost'
-  size?: 'sm' | 'md' | 'lg'
+  variant?: 'primary' | 'ghost'
+  size?: 'sm' | 'md'
 }
 
 export function Button({

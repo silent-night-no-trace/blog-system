@@ -68,8 +68,11 @@ export default async function PostPage({
 
   const sortedPosts = getSortedPosts()
   const currentIndex = sortedPosts.findIndex((p) => p.slug === slug)
-  const prevPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null
-  const nextPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null
+  // sortedPosts is newest-first, so the older post is at index + 1 and the
+  // newer post is at index - 1. 上一篇 points to the older post, 下一篇 to the
+  // newer one, matching chronological reading order.
+  const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null
+  const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null
 
   return (
     <article className="py-12">

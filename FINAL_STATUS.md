@@ -3,13 +3,13 @@
 ## ✅ 已完成的功能
 
 ### 1. 核心组件库
-- ✅ Button (4种变体)
-- ✅ Card (带结构)
-- ✅ Badge (5种颜色)
-- ✅ Container (响应式)
+- ✅ Button (变体: primary、ghost；尺寸: sm、md)
+- ✅ Card (默认变体 + CardContent)
+- ✅ Badge (变体: default、primary)
+- ✅ Container 已移除（全仓无引用，各页面直接使用 `mx-auto max-w-*`）
 
 ### 2. 布局组件
-- ✅ Header (导航栏)
+- ✅ Header (导航栏，客户端组件，移动端 hamburger 菜单)
 - ✅ Footer (页脚，含 RSS 链接)
 
 ### 3. 页面系统 (8个)
@@ -25,10 +25,11 @@
 ### 4. 内容管理
 - ✅ 3篇示例文章
 - ✅ Content Collections 集成
-- ✅ Markdown 通过 Content Collections + remark/rehype 编译为 HTML
+- ✅ Markdown 通过 Content Collections + remark/rehype 编译为 HTML，并经 `rehype-sanitize` 净化（剥离 raw HTML/危险属性，保留 `hljs` 高亮 class）
 - ✅ 已移除无用 MDX runtime 栈（`@next/mdx`、`@mdx-js/react`、`mdxRs`、`app/mdx-components.tsx`）
 - ✅ 独立内容校验脚本：`npm run validate:content`
 - ✅ slug、日期、封面路径、tag slug 校验
+- ✅ 日期以 date-only (`YYYY-MM-DD`) 存储，显示与归档分组经 `lib/site.parsePostDate` 按分量构造，跨时区不漂移
 
 ### 5. 第三方服务
 - ✅ Algolia 搜索 (已配置；同步脚本支持正文清洗、截断与 `tagSlugs`)
@@ -48,9 +49,11 @@
 - ✅ 全站 metadata、canonical、Open Graph、Twitter metadata
 - ✅ `/sitemap.xml`、`/robots.txt`
 - ✅ `/rss.xml` RSS 2.0 Feed，含 Atom self link 与文章 `<category>`
-- ✅ 标签规范化路由：`Next.js` 与 `nextjs` 合并到 `/tags/nextjs`
+- ✅ 标签规范化路由：`Next.js` 与 `nextjs` 合并到 `/tags/nextjs`；中日韩标签（含日文假名、韩文谚文）均可生成 slug
 - ✅ 文章卡片复用组件：`components/posts/post-card.tsx`
-- ✅ 一键验证脚本：`npm run verify`
+- ✅ 上一篇/下一篇按时间顺序导航（更早=上一篇、更新=下一篇）
+- ✅ 纯函数单元测试：`npm run test`（vitest，覆盖 `normalizeTag`、`getArchive`、`getReadingTime`、`cleanSearchContent`）
+- ✅ 一键验证脚本：`npm run verify`（含 test）
 
 ## 📊 技术栈
 
@@ -62,6 +65,8 @@
 - Giscus (评论)
 - next-themes (class 暗黑模式)
 - React 19
+- Vitest (单元测试)
+- rehype-sanitize (Markdown HTML 净化)
 
 ## 🚀 访问地址
 
@@ -83,7 +88,7 @@
 npm run verify
 ```
 
-验证链路：内容校验、ESLint、TypeScript、生产构建、Algolia dry-run。结果通过；生产构建生成 22 个静态页面，Algolia dry-run 准备 3 条记录。
+验证链路：内容校验、ESLint、TypeScript、单元测试、生产构建、Algolia dry-run。结果通过；生产构建生成 22 个静态页面，vitest 22 个用例通过，Algolia dry-run 准备 3 条记录。
 
 ## 📝 下一步
 

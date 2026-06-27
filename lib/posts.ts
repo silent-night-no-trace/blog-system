@@ -1,4 +1,5 @@
 import { allPosts, type Post } from 'content-collections'
+import { parsePostDate } from './site'
 
 export type { Post }
 
@@ -30,14 +31,24 @@ export function getPostBySlug(slug: string) {
   return allPosts.find((post) => post.slug === slug)
 }
 
+// CJK ranges retained in tag slugs: CJK Unified Ideographs (Han, shared by
+// zh/ja/ko), Hiragana + Katakana (ja), and Hangul Syllables (ko). Kept in sync
+// with the cjkPattern in content-collections.ts so Japanese and Korean tags
+// normalize to a non-empty slug instead of being silently dropped.
+const TAG_NON_SLUG_PATTERN = /[^a-z0-9\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af]+/g
+
 export function normalizeTag(tag: string) {
   return tag
     .trim()
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
+    // NFKD decomposes Hangul syllables into jamo (outside the retained CJK
+    // ranges). Recompose with NFC so Korean tags round-trip back to syllables
+    // before we strip non-slug characters.
+    .normalize('NFC')
     .replace(/\./g, '')
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-')
+    .replace(TAG_NON_SLUG_PATTERN, '-')
     .replace(/^-+|-+$/g, '')
 }
 
@@ -114,11 +125,11 @@ export function getTagsWithCounts(): TagSummary[] {
   })
 }
 
-export function getArchive(): ArchiveGroup[] {
+export function getArchive(posts: Post[] = allPosts): ArchiveGroup[] {
   const postsByYear = new Map<number, Map<number, Post[]>>()
 
-  allPosts.forEach((post) => {
-    const date = new Date(post.date)
+  posts.forEach((post) => {
+    const date = parsePostDate(post.date)
     const year = date.getFullYear()
     const month = date.getMonth() + 1
 

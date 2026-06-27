@@ -2,6 +2,7 @@ import { algoliasearch } from 'algoliasearch'
 import { loadEnvConfig } from '@next/env'
 import { allPosts } from 'content-collections'
 import { normalizeTag } from '../lib/posts'
+import { getSearchContent } from '../lib/search-content'
 
 type ContentPost = (typeof allPosts)[number]
 
@@ -18,7 +19,6 @@ type AlgoliaPostRecord = {
 }
 
 const DRY_RUN_FLAG = '--dry-run'
-const SEARCH_CONTENT_MAX_LENGTH = 5000
 
 loadEnvConfig(process.cwd())
 
@@ -34,27 +34,6 @@ function getRequiredEnv(name: string) {
 
 function getIndexName() {
   return process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME || 'blog_posts'
-}
-
-function cleanSearchContent(content: string) {
-  return content
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
-    .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
-    .replace(/[#>*_~\-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function getSearchContent(content: string) {
-  const cleaned = cleanSearchContent(content)
-
-  if (cleaned.length <= SEARCH_CONTENT_MAX_LENGTH) {
-    return cleaned
-  }
-
-  return `${cleaned.slice(0, SEARCH_CONTENT_MAX_LENGTH).trimEnd()}...`
 }
 
 function toAlgoliaRecord(post: ContentPost): AlgoliaPostRecord {
