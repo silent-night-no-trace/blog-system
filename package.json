@@ -8,7 +8,7 @@
     "sync:algolia": "npm run generate:content && tsx scripts/sync-algolia.ts",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

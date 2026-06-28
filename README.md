@@ -410,6 +410,8 @@ npm install -g pm2
 # 启动应用
 pm2 start npm --name "blog-system" -- start
 
+pm2 start npm --name "blog-system" -- run start -- -H 0.0.0.0 -p 3001
+
 # 设置开机自启
 pm2 startup
 pm2 save
@@ -419,6 +421,21 @@ pm2 status
 
 # 查看日志
 pm2 logs blog-system
+
+
+pm2 restart app_name
+pm2 reload app_name
+pm2 stop app_name
+pm2 delete app_name
+
+# 端口检测
+# （不指定 tcp/udp）
+lsof -i :3001 
+
+netstat -tulnp | grep 3001
+ss -tulnp | grep 3001
+
+
 ```
 
 **8. 配置 Nginx**

@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir -p content/posts)",
+      "Bash(mkdir -p content/images)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(git add:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3:*)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(grep:*)",
+      "Bash(npx contentlayer:*)",
+      "Bash(ls content/posts/*.md)",
+      "Bash(cat app/posts/[slug]/page.tsx)",
+      "Bash(node:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(lsof:*)",
+      "Bash(npm list:*)",
+      "Bash(cat content/posts/*.md)",
+      "Bash(ls -1 content/posts/*.md)",
+      "Bash(ls -1 app/*/*.tsx)",
+      "Bash(ls components/ui/*.tsx components/layout/*.tsx components/comments/*.tsx)",
+      "Bash(cat components/ui/*.tsx)",
+      "Bash(ls:*)",
+      "Bash(awk '{print $2, $11, $12}')",
+      "Bash(npm -v)",
+      "Bash(python -m json.tool)",
+      "Bash(git check-ignore *)",
+      "Bash(git commit *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npx tsx *)"
+    ]
+  }
+}
